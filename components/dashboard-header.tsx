@@ -1,16 +1,18 @@
-import { Battery, Settings, Sun, Moon } from 'lucide-react';
+import { Battery, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ModeToggle } from './mode-toggle';
 
 export function DashboardHeader() {
   return (
-    <header className="py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+    <header className="py-6 md:py-8 border-b">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="flex items-center space-x-3">
           <Battery className="w-8 h-8 text-primary" />
-          <h1 className="text-2xl font-bold">BatteryPredict</h1>
+          <h1 className="text-2xl font-bold tracking-tight leading-none">
+            BatteryPredict
+          </h1>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           <ModeToggle />
           <Button variant="outline" size="icon">
@@ -19,12 +21,10 @@ export function DashboardHeader() {
           </Button>
         </div>
       </div>
-      
-      <div className="mt-4">
-        <p className="text-muted-foreground">
-          Predict battery health and estimate remaining useful life using advanced analysis.
-        </p>
-      </div>
+
+      <p className="mt-4 text-sm text-muted-foreground max-w-xl">
+        Predict electric vehicle battery health and estimate remaining useful life using internal resistance metrics.
+      </p>
     </header>
   );
 }

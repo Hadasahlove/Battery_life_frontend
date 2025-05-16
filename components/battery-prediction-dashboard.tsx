@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Battery } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-// Types for our prediction data
+
 export interface PredictionResult {
   status: string;
   message: string;
@@ -37,106 +37,72 @@ export function BatteryPredictionDashboard() {
 
   const handlePredictionSubmit = async (re: number, rct: number) => {
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('http://localhost:5000/api/predict', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/predict`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ Re: re, Rct: rct }),
       });
-
       const data = await response.json();
-      
+
       if (data.status === 'success') {
         setPredictionResult(data);
         setActiveStep('lifespan');
         toast({
           title: "Prediction Successful",
-          description: "Battery RUL has been calculated successfully.",
+          description: "Battery RUL has been calculated successfully."
         });
       } else {
         toast({
           variant: "destructive",
           title: "Prediction Failed",
-          description: data.message || "Failed to predict battery RUL.",
+          description: data.message || "Failed to predict battery RUL."
         });
       }
     } catch (error) {
-      console.error('Error predicting battery life:', error);
       toast({
         variant: "destructive",
         title: "Prediction Failed",
-        description: "Network error or server unavailable.",
+        description: "Network error or server unavailable."
       });
-      
-      // For demo purposes - simulate a successful response
-      const simulatedResult = {
-        status: 'success',
-        message: 'RUL computed using degradation formula (simulated).',
-        Re: re,
-        Rct: rct,
-        degradation_feature: Math.round(re * rct * 100000) / 100000,
-        predicted_RUL: Math.round(1000 / (re * rct + 1) * 100) / 100
-      };
-      setPredictionResult(simulatedResult);
-      setActiveStep('lifespan');
     }
   };
 
   const handleBatteryLifeSubmit = async (mileagePerCycle: number, averageDailyMileage: number) => {
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch('http://localhost:5000/api/battery-life-years', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/battery-life-years`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           mileage_per_cycle: mileagePerCycle,
           average_daily_mileage: averageDailyMileage
-        }),
+        })
       });
 
       const data = await response.json();
-      
+
       if (data.status === 'success') {
         setBatteryLifeResult(data);
         toast({
           title: "Estimation Successful",
-          description: "Battery lifespan has been estimated successfully.",
+          description: "Battery lifespan has been estimated successfully."
         });
       } else {
         toast({
           variant: "destructive",
           title: "Estimation Failed",
-          description: data.message || "Failed to estimate battery lifespan.",
+          description: data.message || "Failed to estimate battery lifespan."
         });
       }
     } catch (error) {
-      console.error('Error estimating battery lifespan:', error);
       toast({
         variant: "destructive",
         title: "Estimation Failed",
-        description: "Network error or server unavailable.",
+        description: "Network error or server unavailable."
       });
-      
-      // For demo purposes - simulate a successful response
-      if (predictionResult) {
-        const simulatedResult = {
-          status: 'success',
-          message: 'Battery lifespan estimated (simulated).',
-          predicted_RUL: predictionResult.predicted_RUL,
-          mileage_per_cycle: mileagePerCycle,
-          average_daily_mileage: averageDailyMileage,
-          total_mileage: Math.round(predictionResult.predicted_RUL * mileagePerCycle * 100) / 100,
-          estimated_lifespan_years: Math.round(
-            (predictionResult.predicted_RUL * mileagePerCycle) / 
-            (averageDailyMileage * 365) * 100
-          ) / 100
-        };
-        setBatteryLifeResult(simulatedResult);
-      }
     }
   };
 
@@ -149,9 +115,9 @@ export function BatteryPredictionDashboard() {
   return (
     <div className="container px-4 py-8 mx-auto max-w-7xl">
       <DashboardHeader />
-      
+
       <div className="grid gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3">
-        <motion.div 
+        <motion.div
           className="lg:col-span-1"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -164,7 +130,7 @@ export function BatteryPredictionDashboard() {
                 {activeStep === 'predict' ? 'Battery Prediction' : 'Battery Lifespan'}
               </h2>
             </div>
-            
+
             <AnimatePresence mode="wait">
               {activeStep === 'predict' ? (
                 <motion.div
@@ -184,8 +150,8 @@ export function BatteryPredictionDashboard() {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <BatteryLifeForm 
-                    onSubmit={handleBatteryLifeSubmit} 
+                  <BatteryLifeForm
+                    onSubmit={handleBatteryLifeSubmit}
                     onBack={() => setActiveStep('predict')}
                     predictedRUL={predictionResult?.predicted_RUL || 0}
                   />
@@ -194,18 +160,20 @@ export function BatteryPredictionDashboard() {
             </AnimatePresence>
           </div>
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           className="lg:col-span-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <ResultsDisplay 
-            predictionResult={predictionResult} 
+          <ResultsDisplay
+            predictionResult={predictionResult}
             batteryLifeResult={batteryLifeResult}
             resetPrediction={resetPrediction}
           />
+
+
         </motion.div>
       </div>
     </div>
